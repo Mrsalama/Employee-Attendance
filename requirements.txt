@@ -1,7 +1,5 @@
---find-links https://wheels.galaxyproject.org/simple/dlib/
-dlib==19.22.1
 streamlit
-face_recognition
+mediapipe
 opencv-python-headless
 pandas
 numpy
