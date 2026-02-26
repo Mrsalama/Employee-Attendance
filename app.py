@@ -1,19 +1,22 @@
 import streamlit as st
 import cv2
-import mediapipe as mp
 import numpy as np
 from datetime import datetime
 
-# إعدادات الصفحة
+# استيراد محمي لـ Mediapipe
+try:
+    import mediapipe as mp
+    mp_face = mp.solutions.face_detection
+except AttributeError:
+    # حل بديل لو النسخة فيها مشكلة في المسارات
+    from mediapipe.python.solutions import face_detection as mp_face
+
 st.set_page_config(page_title="نظام الحضور الذكي | محمد سلامة", layout="centered")
 
-st.title("👤 نظام البصمة الذكي أونلاين")
-st.markdown("---")
+st.title("👤 نظام البصمة الذكي - محمد سلامة")
+st.write("خبير EdTech | SAT English Expert")
 
-# استدعاء حلول جوجل بطريقة متوافقة مع بايثون 3.13
-face_detection = mp.solutions.face_detection
-mp_drawing = mp.solutions.drawing_utils
-
+# واجهة الكاميرا
 img_file = st.camera_input("التقط صورة لتسجيل حضورك")
 
 if img_file:
@@ -22,16 +25,16 @@ if img_file:
     img = cv2.imdecode(file_bytes, 1)
     img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
     
-    # تشغيل التعرف على الوجه
-    with face_detection.FaceDetection(model_selection=0, min_detection_confidence=0.5) as detector:
+    # تشغيل الحساس (Detector)
+    with mp_face.FaceDetection(model_selection=0, min_detection_confidence=0.5) as detector:
         results = detector.process(img_rgb)
 
         if results.detections:
-            st.success("✅ تم التعرف على الوجه بنجاح!")
-            now = datetime.now().strftime("%I:%M:%S %p")
-            st.info(f"مرحباً بك يا أستاذ محمد. تم تسجيل الحضور الساعة: {now}")
+            st.success("✅ أهلاً بك يا محمد! تم التعرف على الوجه.")
             st.balloons()
+            st.info(f"تم تسجيل الحضور: {datetime.now().strftime('%I:%M %p')}")
         else:
-            st.error("❌ لم يتم رصد وجه واضح. حاول ضبط الإضاءة والوقوف أمام الكاميرا مباشرة.")
+            st.warning("⚠️ لم يتم رصد وجه. من فضلك اقترب من الكاميرا وتأكد من الإضاءة.")
 
-st.sidebar.info("هذا النظام يعمل بتقنية Google MediaPipe")
+st.sidebar.markdown("---")
+st.sidebar.write("نظام حضور ذكي خفيف وسريع")
